@@ -1,0 +1,117 @@
+// yeh wala solution bade cases pr tle deta hai.
+class Solution {
+public:
+    int minCost(string colors, vector<int>& neededTime) {
+        int i = 0;
+        int timeRequired = 0;
+        while(i<colors.size()-1){
+            if(colors[i] == colors[i+1]){
+                if(neededTime[i]<neededTime[i+1]){
+                        timeRequired += neededTime[i];
+                        colors.erase(colors.begin() + i);
+                        neededTime.erase(neededTime.begin()+i);
+                }
+                else{
+                        timeRequired += neededTime[i+1];
+                        colors.erase(colors.begin() + i+1);
+                        neededTime.erase(neededTime.begin()+i+1);
+                }
+            }else{
+            i++;
+            }
+        }
+        return timeRequired;
+    }
+};
+
+// recursive solution but memory limit exceeded aa raha hai.
+class Solution {
+public:
+    void solve(int i, string colors, vector<int>& neededTime, int &sum){
+        if(i+1==colors.size()) return;
+        if(colors[i] == colors[i+1]){
+            if(neededTime[i]<neededTime[i+1]){
+            sum+=neededTime[i];
+            colors.erase(colors.begin()+i);
+            neededTime.erase(neededTime.begin()+i);
+            solve(i, colors, neededTime, sum);
+            }
+            else{
+                sum+=neededTime[i+1];
+            colors.erase(colors.begin()+i+1);
+            neededTime.erase(neededTime.begin()+i+1);
+            solve(i, colors, neededTime, sum);
+            }
+        }
+        else{
+            solve(i+1, colors, neededTime, sum);
+        }
+    }
+    int minCost(string colors, vector<int>& neededTime) {
+        int sum = 0;
+         solve(0, colors, neededTime, sum);
+         return sum;
+    }
+};
+//memoized with thoda dimaag but still memory limit exceeded
+class Solution {
+public:
+    int solve(int i, string colors, vector<int>& neededTime, vector<int> &dp){
+        if(i == colors.size()) return 0;
+        if(dp[i]!=-1) return dp[i];
+        if(colors[i]==colors[i+1]){
+            if(neededTime[i]<=neededTime[i+1]){
+                return dp[i] = neededTime[i] + solve(i+1, colors, neededTime, dp);}
+            else{
+                dp[i] = neededTime[i+1];
+                neededTime[i+1] = neededTime[i];
+                return dp[i]+= solve(i+1, colors, neededTime, dp);
+            }
+            }
+        
+        return dp[i] = solve(i+1, colors, neededTime, dp);
+    }
+    int minCost(string colors, vector<int>& neededTime) {
+        vector<int>dp(colors.size(), -1);
+        solve(0, colors, neededTime, dp);
+        return dp[0];
+    }
+};
+// correct code chapa hua from internet pr samajhna abhi baaki hai.
+/*
+
+Author : Manas Rawat
+Date : 27/12/2023
+Problem : Minimum Time to Make Rope Colorful
+Difficulty : Medium
+Problem Link : https://leetcode.com/problems/minimum-time-to-make-rope-colorful/
+Video Solution : https://youtu.be/uhBSJYY1Mw4
+
+*/
+
+
+class Solution {
+public:
+    int minCost(string colors, vector<int>& neededTime) {
+        int n = colors.size();
+        vector<vector<int>> dp(n + 1, vector<int> (27, 0));
+        
+        const int inf = 1e9;
+        
+        for(int i = n - 1; i > -1; i--){
+            for(int j = 0; j < 27; j++){
+                int remove, noremove;
+
+                remove = neededTime[i] + dp[i + 1][j];
+                noremove = dp[i + 1][colors[i] - 'a' + 1];
+                
+                if(colors[i] - 'a' + 1 == j)
+                    dp[i][j] = remove;
+                else
+                    dp[i][j] = min(remove, noremove);
+            }
+        }
+        
+        return dp[0][0];
+    }
+};
