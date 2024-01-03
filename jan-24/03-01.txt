@@ -1,0 +1,21 @@
+https://leetcode.com/problems/number-of-laser-beams-in-a-bank/solutions/4495099/beats-99-01-explained-with-video-c-java-python-js-iterate-and-count/?envType=daily-question&envId=2024-01-03
+
+class Solution {
+public:
+    int numberOfBeams(vector<string>& bank) {
+        int lasers = 0;
+        int prevcnt = 0;
+        for(auto row: bank){
+            int curcnt = 0;
+            for(auto col: row){
+                if(col == '1') curcnt++;
+            }
+            if(curcnt) {
+                lasers+= curcnt* prevcnt;
+                prevcnt = curcnt;
+            }
+            else continue;
+        }
+        return lasers;
+    }
+};
