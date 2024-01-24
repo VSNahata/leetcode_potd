@@ -1,74 +1,47 @@
-// https://leetcode.com/problems/maximum-length-of-a-concatenated-string-with-unique-characters/submissions/1154400321/?envType=daily-question&envId=2024-01-23
+// https://leetcode.com/problems/pseudo-palindromic-paths-in-a-binary-tree/submissions/1155417832/?envType=daily-question&envId=2024-01-24
 
-// my solution
+there is another method of bitmasking , video dekh ke seekh lena, waise yeh bhi kaafi elegant question hai.
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
 class Solution {
 public:
-    int solve(int i, vector<string> &arr, unordered_map<char, int> m){
-        if(i == arr.size()) return 0;
-        int flag = 0;
-        int notTake = solve(i+1, arr, m);
+    // this function returns the no. of pseudo palindromic paths from the given node to the leaf.
+    void solve(TreeNode* node, int need, vector<int>&f, int &count, int &ans){
+        if(!node) return ;
+        int val = node->val;
+        
+        f[val]^=1;
+        if(f[val]) count++;
+        else count--;
 
-            unordered_map<char, int> m2;
-        for(char ch:arr[i]){
-            if(m2.find(ch) != m2.end()){
-                flag = 1;
-                break;
-            }
-            m2[ch]++;
+        if(!node->left && !node->right){
+            if(need == count) ans++;
         }
-        if(flag) return notTake;
-        for(char ch:arr[i]){
-            if(m.find(ch)!= m.end()){
-            flag = 1;
-            break;
-            }
-        }
-        if(flag) return notTake;
-        else{
-        for(char ch:arr[i]){
-            m[ch]++;
-        }
-        return max(notTake, static_cast<int>(arr[i].size() + solve(i+1, arr, m))) ;
-        }
-    }
-    int maxLength(vector<string>& arr) {
-    unordered_map<char, int> m;
-        return solve(0, arr, m);
-    }
-};
 
-//good solution
-class Solution {
-public:
-    int maxLength(vector<string>& arr) {
+        solve(node->left, need^1, f,count,  ans);
+        solve(node->right, need^1, f,count,  ans);
+
+        f[val]^=1;
+        if(!f[val]) count--;
+        else count++;
+        
+    }
+    int pseudoPalindromicPaths (TreeNode* root) {
+        vector<int> f(10, 0);
         int ans = 0;
-        int n = arr.size();
-
-        for(int i = 0; i < (1 << n); i++){
-            int cur_ans = 0;
-            vector<int> f(26, 0);
-
-            for(int j = 0; j < n; j++){
-                if((i >> j) & 1){
-                    cur_ans += arr[j].size();
-
-                    for(auto x : arr[j])
-                        ++f[x - 'a'];
-                }
-            }
-
-            bool ok = 1;
-            for(auto x : f){
-                if(x > 1){
-                    ok = 0;
-                    break;
-                }
-            }
-
-            if(ok)
-                ans = max(ans, cur_ans);
-        }
-
+        int count = 0;
+         solve(root, 1, f,count,  ans);
         return ans;
+
     }
 };
